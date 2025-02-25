@@ -17,7 +17,13 @@ GCS_BUCKET_NAME = 'cnd2bucket'
 storage_client = storage.Client()
 bucket = storage_client.bucket(GCS_BUCKET_NAME)
 
-google_ai.configure(api_key='AIzaSyDiBizXhj8prE2qrJM5vwKtgmpOClZ7TiE') # Replace with your actual API Key
+# Get the API key from environment variables
+API_KEY = os.getenv('GOOGLE_AI_API_KEY')
+
+if API_KEY:
+    google_ai.configure(api_key=API_KEY)
+else:
+    print("API key is missing. Please set the GOOGLE_AI_API_KEY environment variable.")
 model = google_ai.GenerativeModel('gemini-1.5-flash')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
