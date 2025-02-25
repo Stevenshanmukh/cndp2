@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Gallery with Gemini Captions</title>
+</head>
+<body>
+    <h1>Image Gallery with Gemini Captions</h1>
+
+    <h2>Uploaded Images</h2>
+    <div id="image-gallery">
+        {% if images %}
+            {% for image_url in images %}
+                <div class="image-item">
+                    <img src="{{ image_url }}" alt="Uploaded Image" style="max-width: 300px; max-height: 200px;">
+                    <p><strong>Caption:</strong>
+                        {% set image_name_base = image_url.split('/')[-1].split('.')[0] %}
+                        {% set json_blob_name = image_name_base + '.json' %}
+                        {% set json_blob = namespace.bucket.get_blob(json_blob_name) %}
+                        {% if json_blob %}
+                            {% set metadata = json_blob.download_as_text() | from_json %}
+                            {{ metadata.caption }}
+                        {% else %}
+                            No caption available.
+                        {% endif %}
+                    </p>
+                    <p><strong>Description:</strong>
+                        {% if json_blob %}
+                            {{ metadata.description }}
+                        {% else %}
+                            No description available.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No images uploaded yet.</p>
+        {% endif %}
+    </div>
+
+    <h2>Upload New Image</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Upload Image</button>
+    </form>
+
+    <style>
+        #image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .image-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        // You can add more JavaScript here for interactive features if needed
+    </script>
+</body>
+</html>
